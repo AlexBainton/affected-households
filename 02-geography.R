@@ -1,7 +1,3 @@
-# Setup -------------------------------------------------------------------
-
-source("./01-setup.R")
-
 # Functions: Datapacks ---------------------------------------------------
 
 download_datapacks <- function(basename) {
