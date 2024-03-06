@@ -168,6 +168,15 @@ clip_sa1s_to_radius <- function(sa1_df, point, radius) {
   return(sa1_in_radius)
 }
 add_abs_stats_to_radius <- function(df, stats) {
+  df <- add_abs_stats(df, stats) |>
+    mutate(across(
+      all_of(matches({{ stats }})),
+      function(x) .data[["fraction_in_radius"]] * x,
+      .names = "{.col}_scaled"
+    ))
+  return(df)
+}
+add_abs_stats <- function(df, stats) {
   abs_stats <-
     which_datapack_files({{ stats }}) |>
     read_abs_datapacks() |>
@@ -175,12 +184,7 @@ add_abs_stats_to_radius <- function(df, stats) {
   df <- df |>
     left_join(abs_stats,
       by = join_by("sa1_code_2021" == "SA1_CODE_2021")
-    ) |>
-    mutate(across(
-      all_of(matches({{ stats }})),
-      function(x) .data[["fraction_in_radius"]] * x,
-      .names = "{.col}_scaled"
-    ))
+    )
   return(df)
 }
 # get_population_in_radius(sa1, c(-33.879557,151.169359), statistic = "Total_Persons_Persons")

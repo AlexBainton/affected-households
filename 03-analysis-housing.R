@@ -1,3 +1,4 @@
+source("./01-setup.R")
 source("./02-geography.R")
 setup_datapacks()
 sa1 <- strayr::read_absmap("sa12021")
@@ -26,7 +27,7 @@ tmp |>
   ) +
   geom_smooth(method = "lm")
 
-sa1_with_vars |>
+tmp |>
   filter(
     gcc_name_2021 %in% c("Greater Sydney", "Greater Melbourne", "Greater Brisbane", "Australian Capital Territory"),
     Total_Persons_Persons > 20,
@@ -43,7 +44,7 @@ sa1_with_vars |>
 
 test_point <- st_point(c(151.169359, -33.879557))
 df_radius <- clip_sa1s_to_radius(sa1, test_point, 5000)
-df <- df_radius |> add_abs_stats(c("^Average_number_of_Persons_per_bedroom"))
+df <- df_radius |> add_abs_stats_to_radius(c("^Average_number_of_Persons_per_bedroom"))
 df |>
   filter(Average_number_of_Persons_per_bedroom > 0) |>
   ggplot() +
