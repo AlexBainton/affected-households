@@ -42,9 +42,11 @@ tmp |>
 
 # Map the people per bedroom ----------------------------------------------
 
+
 test_point <- st_point(c(151.169359, -33.879557))
 df_radius <- clip_sa1s_to_radius(sa1, test_point, 5000)
-df <- df_radius |> add_abs_stats_to_radius(c("^Average_number_of_Persons_per_bedroom"))
+stats <- c("^Average_number_of_Persons_per_bedroom")
+df <- df_radius |> add_abs_stats(stats) |> add_stats_scaled(stats)
 df |>
   filter(Average_number_of_Persons_per_bedroom > 0) |>
   ggplot() +
