@@ -1,16 +1,24 @@
+# Setup functions and libraries ----
+
 source("./01-setup.R")
-source("./02-geography.R")
+# Setup the required data files immediately.
 setup_datapacks()
+
+# Sourcing geography requires that the correct data files exist in raw-data.
+# Ensure setup_datapacks is called first.
+source("./02-geography.R")
+
+# Pull down geographical shapefiles for SA1 regions from absdata repository.
+# These are originally from the ABS.
 sa1 <- strayr::read_absmap("sa12021")
 
-mystats <- c(
-  "Total_Persons_Persons",
-  "Total_Family_households",
-  "Total_Non_family_households"
-)
+# Setup inputs for an analysis ----
 
 # If you're interested in households, these two variables from the G33 datafile
 # together provide the total number.
+#
+# To find more variables, find the IDs in the datapack's metadata file. That is:
+# raw-data/2021_GCP_SA1_for_AUS_short-header/Metadata/Metadata_2021...xlsx
 mystats_ids <- c(
   # "Total_Family_households"
   "G9341",
@@ -20,8 +28,9 @@ mystats_ids <- c(
 
 mystats_info <- .gcp_names |> filter(Sequential == mystats_ids)
 
-test_point <- st_point(c(151.2103879, -33.8485363))
-df_radius <- clip_sa1s_to_radius(sa1, test_point, 6000)
+selected_point <- st_point(c(151.2103879, -33.8485363)) # long, latitude
+selected_radius <- 6000 # metres
+df_radius <- clip_sa1s_to_radius(sa1, selected_point, selected_radius)
 
 df <- df_radius |>
   add_abs_stats_by_id(mystats_ids) |>
@@ -40,6 +49,7 @@ df |>
   summarise(sum = sum(households_all_scaled)) |>
   pull(sum)
 
+# Create a plot showing the number of households in each SA1 in the radius.
 df |>
   filter("households_all_scaled" > 20) |>
   ggplot() +
